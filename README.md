@@ -29,6 +29,6 @@ try fileSystem.moveItem(
 
 print(try fileTrackedUrl.getCurrentUrl()) // /baz/qux.txt
 
-let dstTrackedUrl = fileSystem.getTrackedUrl(at: rootUrl.appendingPathComponent("foo/bar.txt"))!
+let dstTrackedUrl = fileSystem.getTrackedUrl(at: rootUrl.appendingPathComponent("baz/qux.txt"))!
 print(fileTrackedUrl === dstTrackedUrl) // true
 ```
