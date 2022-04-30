@@ -4,7 +4,7 @@ This package enables to track the identities of file system items when they are 
 
 ## Usage
 
-```
+```swift
 import Foundation
 import TrackingFileSystem
 
