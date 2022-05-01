@@ -194,6 +194,9 @@ public final class TrackingFileSystem {
    - Parameter newObserver: A `TrackingFileSystemObserver` to register.
    */
   public func addObserver(_ newObserver: TrackingFileSystemObserver) {
+    if observers.contains(where: { $0.value == nil }) {
+      observers.sweep()
+    }
     guard !observers.contains(where: { $0.value === newObserver }) else {
       return
     }
@@ -207,7 +210,7 @@ public final class TrackingFileSystem {
    - Parameter observer: A `TrackingFileSystemObserver` to remove.
    */
   public func removeObserver(_ observer: TrackingFileSystemObserver) {
-    observers.removeAll(where: { $0.value === observer })
+    observers.removeAll(where: { $0.value == nil || $0.value === observer })
   }
 
   /**
@@ -265,7 +268,11 @@ private extension Array where Element == WeakTrackingFileSystemObserver {
     }
 
     if shouldSweep {
-      removeAll(where: { $0.value == nil })
+      sweep()
     }
+  }
+
+  mutating func sweep() {
+    removeAll(where: { $0.value == nil })
   }
 }
