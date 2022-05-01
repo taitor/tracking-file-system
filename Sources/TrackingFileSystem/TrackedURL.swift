@@ -3,7 +3,7 @@ import Foundation
 public final class TrackedURL {
   enum Location {
     case root(URL)
-    case intermediate(parent: Weak<TrackedURL>, pathComponent: String)
+    case intermediate(parent: WeakTrackedURL, pathComponent: String)
   }
 
   private(set) var location: Location
@@ -140,4 +140,8 @@ extension TrackedURL: Hashable {
   public func hash(into hasher: inout Hasher) {
     ObjectIdentifier(self).hash(into: &hasher)
   }
+}
+
+struct WeakTrackedURL {
+  weak var value: TrackedURL?
 }

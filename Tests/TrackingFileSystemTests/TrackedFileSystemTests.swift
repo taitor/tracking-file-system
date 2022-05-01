@@ -42,7 +42,7 @@ class TrackingFileSystemTests: XCTestCase {
 
     let fileSystem = try TrackingFileSystem(tracking: testDirectoryUrl)
     let observer = Observer()
-    fileSystem.observer = observer
+    fileSystem.addObserver(observer)
 
     let contents = try fileSystem.contentsOfDirectory(
       at: fileSystem.rootTrackedUrl,
@@ -139,7 +139,7 @@ class TrackingFileSystemTests: XCTestCase {
     try prepareItems()
     let fileSystem = try TrackingFileSystem(tracking: testDirectoryUrl)
     let observer = Observer()
-    fileSystem.observer = observer
+    fileSystem.addObserver(observer)
 
     guard
       let srcTrackedUrl = fileSystem.getTrackedUrl(atPath: "foo/bar/baz"),
@@ -187,7 +187,7 @@ class TrackingFileSystemTests: XCTestCase {
     try prepareItems()
     let fileSystem = try TrackingFileSystem(tracking: testDirectoryUrl)
     let observer = Observer()
-    fileSystem.observer = observer
+    fileSystem.addObserver(observer)
 
     guard
       let srcTrackedUrl = fileSystem.getTrackedUrl(atPath: "foo/bar/baz"),
@@ -241,7 +241,7 @@ class TrackingFileSystemTests: XCTestCase {
     try prepareItems()
     let fileSystem = try TrackingFileSystem(tracking: testDirectoryUrl)
     let observer = Observer()
-    fileSystem.observer = observer
+    fileSystem.addObserver(observer)
 
     try XCTAssertThrowsError(fileSystem.moveItem(
       at: fileSystem.rootTrackedUrl,
@@ -255,7 +255,7 @@ class TrackingFileSystemTests: XCTestCase {
     try prepareItems()
     let fileSystem = try TrackingFileSystem(tracking: testDirectoryUrl)
     let observer = Observer()
-    fileSystem.observer = observer
+    fileSystem.addObserver(observer)
 
     guard let srcTrackedUrl = fileSystem.getTrackedUrl(atPath: "foo/bar/baz") else {
       XCTFail()
@@ -280,7 +280,7 @@ class TrackingFileSystemTests: XCTestCase {
     try prepareItems()
     let fileSystem = try TrackingFileSystem(tracking: testDirectoryUrl)
     let observer = Observer()
-    fileSystem.observer = observer
+    fileSystem.addObserver(observer)
 
     guard let srcTrackedUrl = fileSystem.getTrackedUrl(atPath: "foo/bar/baz") else {
       XCTFail()
@@ -306,7 +306,7 @@ class TrackingFileSystemTests: XCTestCase {
     try prepareItems()
     let fileSystem = try TrackingFileSystem(tracking: testDirectoryUrl)
     let observer = Observer()
-    fileSystem.observer = observer
+    fileSystem.addObserver(observer)
 
     guard let srcTrackedUrl = fileSystem.getTrackedUrl(atPath: "foo/bar/baz") else {
       XCTFail()
@@ -332,7 +332,7 @@ class TrackingFileSystemTests: XCTestCase {
 
     let fileSystem = try TrackingFileSystem(tracking: testDirectoryUrl)
     let observer = Observer()
-    fileSystem.observer = observer
+    fileSystem.addObserver(observer)
 
     let copyTrackedUrl = try fileSystem.copyItem(
       at: fileSystem.rootUrl.appendingPathComponent("foo/bar/baz/qux.data"),
@@ -350,7 +350,7 @@ class TrackingFileSystemTests: XCTestCase {
 
     let fileSystem = try TrackingFileSystem(tracking: testDirectoryUrl)
     let observer = Observer()
-    fileSystem.observer = observer
+    fileSystem.addObserver(observer)
 
     let copyTrackedUrl = try fileSystem.copyItem(
       at: fileSystem.rootUrl.appendingPathComponent("foo"),
@@ -372,7 +372,7 @@ class TrackingFileSystemTests: XCTestCase {
 
     let fileSystem = try TrackingFileSystem(tracking: testDirectoryUrl)
     let observer = Observer()
-    fileSystem.observer = observer
+    fileSystem.addObserver(observer)
 
     try XCTAssertThrowsError(fileSystem.copyItem(
       at: fileSystem.rootUrl.appendingPathComponent("foo/bar/baz/qux.data"),
@@ -387,7 +387,7 @@ class TrackingFileSystemTests: XCTestCase {
 
     let fileSystem = try TrackingFileSystem(tracking: testDirectoryUrl)
     let observer = Observer()
-    fileSystem.observer = observer
+    fileSystem.addObserver(observer)
 
     try XCTAssertThrowsError(fileSystem.copyItem(
       at: fileSystem.rootUrl.appendingPathComponent("foo/bar/baz/qux.data"),
@@ -401,7 +401,7 @@ class TrackingFileSystemTests: XCTestCase {
     try prepareItems()
     let fileSystem = try TrackingFileSystem(tracking: testDirectoryUrl)
     let observer = Observer()
-    fileSystem.observer = observer
+    fileSystem.addObserver(observer)
 
     guard
       let srcTrackedUrl = fileSystem.getTrackedUrl(atPath: "foo/bar/baz"),
@@ -424,7 +424,7 @@ class TrackingFileSystemTests: XCTestCase {
     try prepareItems()
     let fileSystem = try TrackingFileSystem(tracking: testDirectoryUrl)
     let observer = Observer()
-    fileSystem.observer = observer
+    fileSystem.addObserver(observer)
 
     guard
       let srcTrackedUrl = fileSystem.getTrackedUrl(atPath: "foo/bar/baz"),
@@ -447,7 +447,7 @@ class TrackingFileSystemTests: XCTestCase {
     try prepareItems()
     let fileSystem = try TrackingFileSystem(tracking: testDirectoryUrl)
     let observer = Observer()
-    fileSystem.observer = observer
+    fileSystem.addObserver(observer)
 
     try XCTAssertThrowsError(fileSystem.removeItem(
       at: fileSystem.rootTrackedUrl

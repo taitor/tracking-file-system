@@ -4,7 +4,7 @@ public final class TrackingFileSystem {
   private let fileManager: FileManager
   public let rootUrl: URL
   public let rootTrackedUrl: TrackedURL
-  public weak var observer: TrackingFileSystemObserver?
+  private var observers: [WeakTrackingFileSystemObserver] = []
 
   /**
    Initialize a `TrackingFileSystem` which tracks items under the given `URL`.
@@ -126,7 +126,7 @@ public final class TrackingFileSystem {
 
     try fileManager.moveItem(at: srcUrl, to: dstUrl)
 
-    observer?.trackingFileSystem(self, willMove: srcTrackedUrl, from: srcUrl, to: dstUrl)
+    observers.forEach { $0.trackingFileSystem(self, willMove: srcTrackedUrl, from: srcUrl, to: dstUrl) }
     let dstParent = getOrCreateTrackedUrl(at: dstPathComponents.dropLast())
     srcTrackedUrl.dangerouslyRemoveSelf()
     dstParent.dangerouslyAddChild(srcTrackedUrl, withPathComponent: newPathComponent)
@@ -171,7 +171,7 @@ public final class TrackingFileSystem {
 
     try fileManager.removeItem(at: trackedUrl.getCurrentUrl())
 
-    observer?.trackingFileSystem(self, willRemove: trackedUrl)
+    observers.forEach { $0.trackingFileSystem(self, willRemove: trackedUrl) }
     trackedUrl.dangerouslyRemoveSelf()
   }
 
@@ -183,6 +183,38 @@ public final class TrackingFileSystem {
    */
   public func owns(trackedUrl: TrackedURL) -> Bool {
     trackedUrl.root == rootTrackedUrl
+  }
+
+  /**
+   Add a `TrackingFileSystemObserver` to this `TrackingFileSystem` if it's not been registered yet.
+
+   Calling this method for the same `TrackingFileSystemObserver` multiple times has no effects.
+   - Important: `TrackingFileSystem` doesn't retain `TrackingFileSystemObserver`'s references.
+   You must retain them somewhere by yourself.
+   - Parameter newObserver: A `TrackingFileSystemObserver` to register.
+   */
+  public func addObserver(_ newObserver: TrackingFileSystemObserver) {
+    guard !observers.contains(where: { $0.value === newObserver }) else {
+      return
+    }
+    observers.append(.init(value: newObserver))
+  }
+
+  /**
+   Remove a `TrackingFileSystemObserver` from this `TrackingFileSystem` if it's currently registered.
+
+   Calling this method for the same `TrackingFileSystemObserver` multiple times has no effects.
+   - Parameter observer: A `TrackingFileSystemObserver` to remove.
+   */
+  public func removeObserver(_ observer: TrackingFileSystemObserver) {
+    observers.removeAll(where: { $0.value === observer })
+  }
+
+  /**
+   Remove all `TrackingFileSystemObserver`s from this `TrackingFileSystem`.
+   */
+  public func removeAllObservers() {
+    observers.removeAll()
   }
 
   private func getOrCreateTrackedUrl(
@@ -204,7 +236,7 @@ public final class TrackingFileSystem {
     let result = trackedUrl.getOrCreateChild(withPathComponent: pathComponent, created: &created)
 
     if created {
-      observer?.trackingFileSystem(self, didStartTracking: result)
+      observers.forEach { $0.trackingFileSystem(self, didStartTracking: result) }
     }
 
     return result
@@ -214,5 +246,26 @@ public final class TrackingFileSystem {
 extension TrackingFileSystem: CustomStringConvertible {
   public var description: String {
     "TrackingFileSystem rootTrackedUrl=\(rootTrackedUrl)"
+  }
+}
+
+private struct WeakTrackingFileSystemObserver {
+  weak var value: TrackingFileSystemObserver?
+}
+
+private extension Array where Element == WeakTrackingFileSystemObserver {
+  mutating func forEach(_ body: (TrackingFileSystemObserver) throws -> Void) rethrows {
+    var shouldSweep = false
+    for wrapped in self {
+      if let observer = wrapped.value {
+        try body(observer)
+      } else {
+        shouldSweep = true
+      }
+    }
+
+    if shouldSweep {
+      removeAll(where: { $0.value == nil })
+    }
   }
 }
