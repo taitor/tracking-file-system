@@ -95,6 +95,35 @@ public final class TrackingFileSystem {
   }
 
   /**
+   Create a directory with the given attributes at the given `URL`.
+
+   - Important: The given `URL` must be a descendant of `rootUrl`, otherwise this method throws an error.
+   - Throws: `TrackingFileSystemError.badURL` when `url` doesn't belong to this `TrackingFileSystem`.
+   - Throws: When failed to create a directory at the given `URL`.
+   - Parameter url: A file `URL` that specifies the directory to create.
+   - Parameter createIntermediates: Please refer to the `createIntermediates` parameter in [`FileManager.createDirectory(at:withIntermediateDirectories:attributes:)`](https://developer.apple.com/documentation/foundation/filemanager/1415371-createdirectory).
+   - Parameter attributes: Please refer to the `attributes` parameter in [`FileManager.createDirectory(at:withIntermediateDirectories:attributes:)`](https://developer.apple.com/documentation/foundation/filemanager/1415371-createdirectory).
+   - Returns: A `TrackedURL` for the created directory.
+   */
+  public func createDirectory(
+    at url: URL,
+    withIntermediateDirectories createIntermediates: Bool,
+    attributes: [FileAttributeKey: Any]? = nil
+  ) throws -> TrackedURL {
+    guard rootUrl.isAncestorFileUrl(of: url) else {
+      throw TrackingFileSystemError.badURL(reason: "\(url) doesn't belong to this TrackingFileSystem.")
+    }
+
+    try fileManager.createDirectory(
+      at: url,
+      withIntermediateDirectories: createIntermediates,
+      attributes: attributes
+    )
+
+    return getOrCreateTrackedUrl(at: url.pathComponents(relativeTo: rootUrl))
+  }
+
+  /**
    Move a file or directory at the given `TrackedURL` to a new location.
 
    - Throws: When either `srcTrackedUrl` or `dstUrl` is either not owned by this `TrackingFileSystem` or the root.
