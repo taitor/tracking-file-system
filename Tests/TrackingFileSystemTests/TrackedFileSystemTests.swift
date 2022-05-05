@@ -111,6 +111,37 @@ class TrackingFileSystemTests: XCTestCase {
     ])
   }
 
+  func testCreateDirectory() throws {
+    let fileSystem = try TrackingFileSystem(tracking: testDirectoryUrl)
+    let observer = Observer()
+    fileSystem.addObserver(observer)
+
+    let shallowDirectory = testDirectoryUrl.appendingPathComponent("shallow")
+    let shallowTrackedUrl = try fileSystem.createDirectory(
+      at: shallowDirectory,
+      withIntermediateDirectories: false
+    )
+    XCTAssertEqual(shallowTrackedUrl, fileSystem.getTrackedUrl(atPath: "shallow"))
+
+    let deepDirectory = testDirectoryUrl.appendingPathComponent("this/is/deep")
+    try XCTAssertThrowsError(fileSystem.createDirectory(
+      at: deepDirectory,
+      withIntermediateDirectories: false
+    ))
+    let deepTrackedUrl = try fileSystem.createDirectory(
+      at: deepDirectory,
+      withIntermediateDirectories: true
+    )
+    XCTAssertEqual(deepTrackedUrl, fileSystem.getTrackedUrl(atPath: "this/is/deep"))
+
+    XCTAssertEqual(observer.didStartTrackingArguments, [
+      .init(fileSystem: fileSystem, trackedUrl: fileSystem.getTrackedUrl(atPath: "shallow")!),
+      .init(fileSystem: fileSystem, trackedUrl: fileSystem.getTrackedUrl(atPath: "this")!),
+      .init(fileSystem: fileSystem, trackedUrl: fileSystem.getTrackedUrl(atPath: "this/is")!),
+      .init(fileSystem: fileSystem, trackedUrl: fileSystem.getTrackedUrl(atPath: "this/is/deep")!),
+    ])
+  }
+
   /**
    * Create some directories and files in testDirectoryUrl for testing
    * /
